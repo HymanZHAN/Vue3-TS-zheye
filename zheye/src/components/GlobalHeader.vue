@@ -13,7 +13,7 @@
     </ul>
     <ul v-else class="mb-0">
       <li class="list-inline-item">
-        <Dropdown :title="`你好，${user.name}`">
+        <dropdown :title="`你好，${user.name}`">
           <DropdownItem>
             <a href="#" class="dropdown-item">新建文章</a>
           </DropdownItem>
@@ -23,7 +23,7 @@
           <DropdownItem>
             <a href="#" class="dropdown-item">退出登录</a>
           </DropdownItem>
-        </Dropdown>
+        </dropdown>
       </li>
     </ul>
   </nav>

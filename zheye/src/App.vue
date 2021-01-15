@@ -1,7 +1,8 @@
 <template>
   <GlobalHeader :user="user" />
   <div class="container">
-    <ColumnList :list="list" />
+    <!-- <ColumnList :list="list" /> -->
+    <Form></Form>
   </div>
 </template>
 
@@ -11,6 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import GlobalHeader, { UserProps } from "@/components/GlobalHeader.vue";
 import ColumnList, { ColumnProps } from "@/components/ColumnList.vue";
+import Form from "@/components/Form.vue";
 
 const testData: ColumnProps[] = [
   {
@@ -47,7 +49,7 @@ const currentUser: UserProps = {
 
 export default defineComponent({
   name: "App",
-  components: { ColumnList, GlobalHeader },
+  components: { Form, GlobalHeader },
   setup() {
     return { list: testData, user: currentUser };
   },
