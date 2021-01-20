@@ -1,6 +1,16 @@
 <template>
   <div class="validate-input-container pb-3">
     <input
+      v-if="tag !== 'textarea'"
+      class="form-control"
+      :class="{ 'is-invalid': inputRef.error }"
+      :value="inputRef.val"
+      @input="updateValue"
+      @blur="validateInput"
+      v-bind="$attrs"
+    />
+    <textarea
+      v-else
       class="form-control"
       :class="{ 'is-invalid': inputRef.error }"
       :value="inputRef.val"
@@ -16,8 +26,10 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, PropType, reactive } from "vue";
-const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 import { emitter } from "./ValidateForm.vue";
+
+const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 interface RuleProp {
   type: "email" | "required" | "range";
@@ -27,11 +39,14 @@ export type RulesProp = RuleProp[];
 
 export type InputType = "text" | "email" | "password";
 
+export type InputTag = "input" | "textarea";
+
 export default defineComponent({
   inheritAttrs: false,
   props: {
     rules: Array as PropType<RulesProp>,
     modelValue: String,
+    tag: { type: String as PropType<InputTag>, default: "input" },
   },
 
   setup(props, context) {

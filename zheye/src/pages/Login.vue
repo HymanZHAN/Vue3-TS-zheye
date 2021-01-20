@@ -4,7 +4,6 @@
       <label for="emailInput" class="form-label">邮箱地址</label>
       <ValidateInput
         id="emailInput"
-        ref="inputRef"
         type="email"
         placeholder="请输入邮箱地址"
         v-model="emailVal"
@@ -31,8 +30,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
 import ValidateInput, { RulesProp } from "@/components/ValidateInput.vue";
 import ValidateForm from "@/components/ValidateForm.vue";
+import { useStore } from "vuex";
+import { GlobalDataProps } from "@/store";
 
 export default defineComponent({
   components: {
@@ -40,7 +42,9 @@ export default defineComponent({
     ValidateForm,
   },
   setup() {
-    const inputRef = ref<any>();
+    const router = useRouter();
+    const store = useStore<GlobalDataProps>();
+
     const emailVal = ref("");
     const emailRules: RulesProp = [
       { type: "required", message: "电子邮箱不能为空" },
@@ -52,8 +56,11 @@ export default defineComponent({
       { type: "required", message: "密码不能为空" },
     ];
 
-    const onFormSubmit = (result: boolean) => {
-      console.log(result);
+    const onFormSubmit = (isFormValid: boolean) => {
+      if (isFormValid) {
+        store.commit("login");
+        router.push("/");
+      }
     };
 
     return {
@@ -62,7 +69,6 @@ export default defineComponent({
       passwordVal,
       passwordRules,
       onFormSubmit,
-      inputRef,
     };
   },
 });

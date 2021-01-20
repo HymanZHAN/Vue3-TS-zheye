@@ -18,7 +18,10 @@ export const emitter = mitt();
 type Validator = () => boolean;
 
 export default defineComponent({
+  name: "ValidationForm",
+
   emits: ["form-submit"],
+
   setup(props, context) {
     let validators: Validator[] = [];
     const registerValidator = (func: Validator | undefined) => {

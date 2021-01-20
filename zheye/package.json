@@ -1,7 +1,7 @@
 {
   "name": "zheye",
   "version": "0.1.0",
-  "private": true,
+  "private": true, 
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -12,7 +12,8 @@
     "bootstrap": "^5.0.0-beta1",
     "mitt": "^2.1.0",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "vuex": "^4.0.0-rc.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
