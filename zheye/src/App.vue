@@ -11,7 +11,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import GlobalHeader from "@/components/GlobalHeader.vue";
 import { useStore } from "vuex";
-import { GlobalDataProps } from "./store";
+import { GlobalDataProps } from "./store/types";
 
 export default defineComponent({
   name: "App",

@@ -23,19 +23,24 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import ColumnList from "@/components/ColumnList.vue";
 import { useStore } from "vuex";
-import { GlobalDataProps } from "@/store";
+import { GlobalDataProps } from "@/store/types";
 
 export default defineComponent({
   name: "Home",
   components: { ColumnList },
   setup() {
     const store = useStore<GlobalDataProps>();
+    onMounted(() => {
+      store.dispatch("fetchColumns");
+    });
+
     const list = computed(() => {
       return store.state.columns;
     });
+
     const biggerLen = computed(() => store.getters.biggerColumnsLen);
     return { list, biggerLen };
   },
