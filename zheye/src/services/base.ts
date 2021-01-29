@@ -1,3 +1,4 @@
+import { store } from "@/store";
 import ky from "ky";
 
 const baseUrl = "http://apis.imooc.com/api";
@@ -22,11 +23,19 @@ const addIcodeToPostBody = async (request: Request) => {
   }
 };
 
+const showLoading = () => {
+  store.commit("setLoading", true);
+};
+const hideLoading = () => {
+  store.commit("setLoading", false);
+};
+
 export const api = ky
   .create({ prefixUrl: baseUrl, searchParams: icodeParam })
   .extend({
     hooks: {
-      beforeRequest: [addIcodeToPostBody],
+      beforeRequest: [addIcodeToPostBody, showLoading],
+      afterResponse: [hideLoading],
     },
   });
 

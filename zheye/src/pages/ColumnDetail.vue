@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { computed, ComputedRef, defineComponent, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 import PostList from "@/components/PostList.vue";
@@ -45,8 +45,12 @@ export default defineComponent({
       store.dispatch("fetchPosts", currentId);
     });
 
-    const column: ColumnProps = store.getters.getColumnById(currentId);
-    const posts: PostProps = store.getters.getPostsByColumnId(currentId);
+    const column: ComputedRef<ColumnProps> = computed(() =>
+      store.getters.getColumnById(currentId),
+    );
+    const posts: ComputedRef<PostProps> = computed(() =>
+      store.getters.getPostsByColumnId(currentId),
+    );
     return { column, posts };
   },
 });

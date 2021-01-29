@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { computed, ComputedRef, defineComponent, PropType } from "vue";
 import { PostProps } from "@/store/types";
 
 export default defineComponent({
@@ -36,16 +36,15 @@ export default defineComponent({
       type: Array as PropType<PostProps[]>,
     },
   },
-  created() {
-    console.log("Post list created");
-  },
   setup(props) {
-    const postList: PostProps[] = props.posts.map((p) => {
-      if (!p.image) {
-        p.image = require("@/assets/default-post.png");
-      }
-      return p;
-    });
+    const postList: ComputedRef<PostProps[]> = computed(() =>
+      props.posts.map((p) => {
+        if (!p.image) {
+          p.image = require("@/assets/default-post.png");
+        }
+        return p;
+      }),
+    );
     return { postList };
   },
 });

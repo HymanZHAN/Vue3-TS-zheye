@@ -9,11 +9,3 @@ app
   .use(router)
   .use(store)
   .mount("#app");
-
-// import { api } from "@/services/base";
-
-// api.get("columns").then((resp) => {
-//   resp.json().then((result) => {
-//     console.log(result.data.list);
-//   });
-// });

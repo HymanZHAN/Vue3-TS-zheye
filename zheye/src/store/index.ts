@@ -1,15 +1,19 @@
-import { createStore } from "vuex";
+import { Commit, createStore } from "vuex";
 import api from "../services/base";
-import {
-  ColumnProps,
-  GlobalDataProps,
-  ListData,
-  PostProps,
-  Resp,
-} from "./types";
+import { GlobalDataProps, PostProps, Resp } from "./types";
+
+const getAndCommit = async <T>(
+  url: string,
+  mutation: string,
+  commit: Commit,
+) => {
+  const result = await api.get(url).json<Resp<T>>();
+  commit(mutation, result.data);
+};
 
 export const store = createStore<GlobalDataProps>({
   state: {
+    loading: false,
     columns: [],
     posts: [],
     user: {
@@ -34,36 +38,30 @@ export const store = createStore<GlobalDataProps>({
     createPost(state, newPost: PostProps) {
       state.posts.push(newPost);
     },
-    setPosts(state, posts) {
-      state.posts = posts;
+    setPosts(state, data) {
+      state.posts = data.list;
     },
-    setColumns(state, columns) {
-      state.columns = columns;
+    setColumns(state, data) {
+      state.columns = data.list;
     },
-    setColumn(state, column) {
-      state.columns = [column];
+    setColumn(state, data) {
+      state.columns = [data];
+    },
+    setLoading(state, status) {
+      state.loading = status;
     },
   },
   actions: {
     async fetchColumns({ commit }) {
-      const columns = await api
-        .get("columns")
-        .json<Resp<ListData<ColumnProps>>>();
-      commit("setColumns", columns.data.list);
+      await getAndCommit("columns", "setColumns", commit);
     },
 
     async fetchColumn({ commit }, columnId) {
-      const column = await api
-        .get(`columns/${columnId}`)
-        .json<Resp<ColumnProps>>();
-      commit("setColumn", column.data);
+      await getAndCommit(`columns/${columnId}`, "setColumn", commit);
     },
 
     async fetchPosts({ commit }, columnId) {
-      const column = await api
-        .get(`columns/${columnId}/posts`)
-        .json<Resp<ListData<PostProps>>>();
-      commit("setPosts", column.data.list);
+      await getAndCommit(`columns/${columnId}/posts`, "setPosts", commit);
     },
   },
 });
