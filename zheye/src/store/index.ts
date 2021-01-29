@@ -13,18 +13,18 @@ export const store = createStore<GlobalDataProps>({
     columns: [],
     posts: [],
     user: {
-      columnId: 1,
+      columnId: "asdfasdf",
       isLoggedIn: true,
       name: "xzhan",
       id: 1,
     },
   },
   getters: {
-    getColumnById: (state) => (id: number) => {
-      return state.columns.find((c) => c._id === String(id));
+    getColumnById: (state) => (id: string) => {
+      return state.columns.find((c) => c._id === id);
     },
-    getPostsByColumnId: (state) => (columnId: number) => {
-      return state.posts.filter((p) => p.columnId === columnId);
+    getPostsByColumnId: (state) => (columnId: string) => {
+      return state.posts.filter((p) => p.column === columnId);
     },
   },
   mutations: {
@@ -38,8 +38,10 @@ export const store = createStore<GlobalDataProps>({
       state.posts = posts;
     },
     setColumns(state, columns) {
-      console.log(columns);
       state.columns = columns;
+    },
+    setColumn(state, column) {
+      state.columns = [column];
     },
   },
   actions: {
@@ -48,6 +50,20 @@ export const store = createStore<GlobalDataProps>({
         .get("columns")
         .json<Resp<ListData<ColumnProps>>>();
       commit("setColumns", columns.data.list);
+    },
+
+    async fetchColumn({ commit }, columnId) {
+      const column = await api
+        .get(`columns/${columnId}`)
+        .json<Resp<ColumnProps>>();
+      commit("setColumn", column.data);
+    },
+
+    async fetchPosts({ commit }, columnId) {
+      const column = await api
+        .get(`columns/${columnId}/posts`)
+        .json<Resp<ListData<PostProps>>>();
+      commit("setPosts", column.data.list);
     },
   },
 });

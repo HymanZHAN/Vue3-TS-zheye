@@ -1,11 +1,11 @@
 <template>
   <div class="post-list">
-    <div v-for="post in postList" :key="post.id" class="card mb-3">
+    <div v-for="post in postList" :key="post._id" class="card mb-3">
       <div class="row g-0">
         <div class="col-4 align-middle position-relative">
           <img
             class="post-image position-absolute top-50 start-50 translate-middle"
-            :src="post.image"
+            :src="post.image && post.image.url"
             :alt="post.title"
           />
         </div>
@@ -36,14 +36,16 @@ export default defineComponent({
       type: Array as PropType<PostProps[]>,
     },
   },
+  created() {
+    console.log("Post list created");
+  },
   setup(props) {
-    const postList = props.posts.map((p) => {
+    const postList: PostProps[] = props.posts.map((p) => {
       if (!p.image) {
         p.image = require("@/assets/default-post.png");
       }
       return p;
     });
-    console.log(postList);
     return { postList };
   },
 });
@@ -51,7 +53,7 @@ export default defineComponent({
 
 <style scoped>
 .post-image {
-  max-height: 120px;
+  max-height: 100%;
   max-width: 100%;
   margin: auto;
 }

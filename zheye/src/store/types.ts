@@ -12,19 +12,20 @@ export interface ColumnProps {
 }
 
 export interface PostProps {
-  id: number;
+  _id: string;
   title: string;
-  content: string;
-  image?: string;
+  excerpt?: string;
+  content?: string;
+  image?: ImageProps;
+  column: string;
   createdAt: string;
-  columnId: number;
 }
 
 export interface UserProps {
   isLoggedIn: boolean;
   name?: string;
   id?: number;
-  columnId?: number;
+  columnId?: string;
 }
 
 export interface GlobalDataProps {

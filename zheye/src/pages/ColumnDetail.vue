@@ -5,7 +5,11 @@
       class="column-info row mb-4 border-bottom pb-4 align-items-center"
     >
       <div class="col-3 text-center column-avatar">
-        <img class="rounded-circle" :src="column.avatar" :alt="column.title" />
+        <img
+          class="rounded-circle border w-100"
+          :src="column.avatar && column.avatar.url"
+          :alt="column.title"
+        />
       </div>
 
       <div class="col-9">
@@ -18,11 +22,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 import PostList from "@/components/PostList.vue";
 import { useStore } from "vuex";
+import { ColumnProps, PostProps } from "@/store/types";
 
 export default defineComponent({
   name: "ColumnDetail",
@@ -33,9 +38,15 @@ export default defineComponent({
     const route = useRoute();
     const store = useStore();
 
-    const currentId = +route.params.id;
-    const column = store.getters.getColumnById(currentId);
-    const posts = store.getters.getPostsByColumnId(currentId);
+    const currentId = route.params.id;
+
+    onMounted(() => {
+      store.dispatch("fetchColumn", currentId);
+      store.dispatch("fetchPosts", currentId);
+    });
+
+    const column: ColumnProps = store.getters.getColumnById(currentId);
+    const posts: PostProps = store.getters.getPostsByColumnId(currentId);
     return { column, posts };
   },
 });
