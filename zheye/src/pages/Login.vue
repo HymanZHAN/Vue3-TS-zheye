@@ -56,10 +56,19 @@ export default defineComponent({
       { type: "required", message: "密码不能为空" },
     ];
 
-    const onFormSubmit = (isFormValid: boolean) => {
+    const onFormSubmit = async (isFormValid: boolean) => {
       if (isFormValid) {
-        store.commit("login");
-        router.push("/");
+        const loginPaylod = {
+          email: emailVal.value,
+          password: passwordVal.value,
+        };
+        try {
+          const result = await store.dispatch("login", loginPaylod);
+          console.log(result);
+          router.push("/");
+        } catch (error) {
+          console.error(error);
+        }
       }
     };
 

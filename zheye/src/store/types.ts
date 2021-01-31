@@ -28,7 +28,12 @@ export interface UserProps {
   columnId?: string;
 }
 
+export interface TokenProps {
+  token: string;
+}
+
 export interface GlobalDataProps {
+  token: string;
   loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];

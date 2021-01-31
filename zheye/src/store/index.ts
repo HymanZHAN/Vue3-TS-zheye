@@ -1,6 +1,6 @@
 import { Commit, createStore } from "vuex";
 import api from "../services/base";
-import { GlobalDataProps, PostProps, Resp } from "./types";
+import { GlobalDataProps, PostProps, Resp, TokenProps } from "./types";
 
 const getAndCommit = async <T>(
   url: string,
@@ -11,18 +11,31 @@ const getAndCommit = async <T>(
   commit(mutation, result.data);
 };
 
+const postAndCommit = async <T>(
+  url: string,
+  mutation: string,
+  commit: Commit,
+  payload: unknown,
+) => {
+  const result = await api.post(url, { json: payload }).json<Resp<T>>();
+  commit(mutation, result.data);
+  return result;
+};
+
 export const store = createStore<GlobalDataProps>({
   state: {
+    token: "",
     loading: false,
     columns: [],
     posts: [],
     user: {
       columnId: "asdfasdf",
-      isLoggedIn: true,
+      isLoggedIn: false,
       name: "xzhan",
       id: 1,
     },
   },
+
   getters: {
     getColumnById: (state) => (id: string) => {
       return state.columns.find((c) => c._id === id);
@@ -31,9 +44,10 @@ export const store = createStore<GlobalDataProps>({
       return state.posts.filter((p) => p.column === columnId);
     },
   },
+
   mutations: {
-    login(state) {
-      state.user = { ...state.user, isLoggedIn: true, name: "xzhan" };
+    login(state, data) {
+      state.token = data.token;
     },
     createPost(state, newPost: PostProps) {
       state.posts.push(newPost);
@@ -51,6 +65,7 @@ export const store = createStore<GlobalDataProps>({
       state.loading = status;
     },
   },
+
   actions: {
     async fetchColumns({ commit }) {
       await getAndCommit("columns", "setColumns", commit);
@@ -62,6 +77,15 @@ export const store = createStore<GlobalDataProps>({
 
     async fetchPosts({ commit }, columnId) {
       await getAndCommit(`columns/${columnId}/posts`, "setPosts", commit);
+    },
+
+    async login({ commit }, payload) {
+      return await postAndCommit<TokenProps>(
+        "user/login",
+        "login",
+        commit,
+        payload,
+      );
     },
   },
 });

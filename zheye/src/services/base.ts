@@ -1,23 +1,21 @@
 import { store } from "@/store";
-import ky from "ky";
+import ky, { Options } from "ky";
 
 const baseUrl = "http://apis.imooc.com/api";
 const icode = "9D9FE119391E6C24";
 const icodeParam = `icode=${icode}`;
 
-const addIcodeToPostBody = async (request: Request) => {
+const addIcodeToPostBody = async (request: Request, options: Options) => {
   if (request.method == "POST") {
-    if (request.body instanceof FormData) {
-      const cloneReq = request.clone();
-      const newBody = request.body;
+    if (options.body instanceof FormData) {
+      const newBody = options.body;
       newBody.append("icode", icode);
-      return new Request(cloneReq, { body: newBody });
-    } else if (request.body instanceof String) {
-      const cloneReq = request.clone();
-      const jsonBody = await request.json();
-      const newJsonBody = { ...jsonBody, icode: icode };
-      return new Request(cloneReq, {
-        body: JSON.stringify(newJsonBody),
+      return new Request(request, {
+        body: newBody,
+      });
+    } else if (options.json instanceof Object) {
+      return new Request(request, {
+        body: JSON.stringify({ ...options.json, icode }),
       });
     }
   }
