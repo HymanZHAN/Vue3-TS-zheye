@@ -35,6 +35,7 @@ import ValidateInput, { RulesProp } from "@/components/ValidateInput.vue";
 import ValidateForm from "@/components/ValidateForm.vue";
 import { useStore } from "vuex";
 import { GlobalDataProps } from "@/store/types";
+import { createMessage } from "@/components/createMessage";
 
 export default defineComponent({
   components: {
@@ -62,12 +63,12 @@ export default defineComponent({
           email: emailVal.value,
           password: passwordVal.value,
         };
-        try {
-          const result = await store.dispatch("login", loginPaylod);
-          console.log(result);
-          router.push("/");
-        } catch (error) {
-          console.error(error);
+        await store.dispatch("loginAndFetchCurrentUser", loginPaylod);
+        if (store.state.token) {
+          createMessage("登陆成功，2秒后跳转到首页...", "success");
+          setTimeout(() => {
+            router.push("/");
+          }, 2000);
         }
       }
     };

@@ -11,13 +11,13 @@
       </li>
       <li class="list-inline-item">
         <router-link to="/login" class="btn btn-outline-light">
-          登陆
+          登录
         </router-link>
       </li>
     </ul>
     <ul v-else class="mb-0">
       <li class="list-inline-item">
-        <dropdown :title="`你好，${user.name}`">
+        <dropdown :title="`你好，${user.nickName}`">
           <DropdownItem>
             <a href="#" class="dropdown-item">新建文章</a>
           </DropdownItem>
@@ -25,7 +25,7 @@
             <a href="#" class="dropdown-item">修改资料</a>
           </DropdownItem>
           <DropdownItem>
-            <a href="#" class="dropdown-item">退出登录</a>
+            <a href="#" class="dropdown-item" @click="logout">退出登录</a>
           </DropdownItem>
         </dropdown>
       </li>
@@ -37,12 +37,8 @@
 import { defineComponent, PropType } from "vue";
 import Dropdown from "@/components/Dropdown.vue";
 import DropdownItem from "@/components/DropdownItem.vue";
-
-export interface UserProps {
-  id?: number;
-  name?: string;
-  isLoggedIn: boolean;
-}
+import { GlobalDataProps, UserProps } from "@/store/types";
+import { useStore } from "vuex";
 
 export default defineComponent({
   components: {
@@ -56,7 +52,13 @@ export default defineComponent({
     },
   },
   setup() {
-    return {};
+    const store = useStore<GlobalDataProps>();
+
+    const logout = () => {
+      store.dispatch("logout");
+    };
+
+    return { logout };
   },
 });
 </script>

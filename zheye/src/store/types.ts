@@ -22,10 +22,13 @@ export interface PostProps {
 }
 
 export interface UserProps {
+  _id?: string;
+  avatar?: ImageProps;
+  column?: string;
+  email: string;
+  description?: string;
+  nickName?: string;
   isLoggedIn: boolean;
-  name?: string;
-  id?: number;
-  columnId?: string;
 }
 
 export interface TokenProps {
@@ -38,6 +41,12 @@ export interface GlobalDataProps {
   columns: ColumnProps[];
   posts: PostProps[];
   user: UserProps;
+  error: GlobalErrorProps;
+}
+
+export interface GlobalErrorProps {
+  status: boolean;
+  message?: string;
 }
 
 export interface ListData<T> {

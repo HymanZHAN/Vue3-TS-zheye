@@ -5,7 +5,7 @@ const baseUrl = "http://apis.imooc.com/api";
 const icode = "9D9FE119391E6C24";
 const icodeParam = `icode=${icode}`;
 
-const addIcodeToPostBody = async (request: Request, options: Options) => {
+const addIcodeToPostBody = (request: Request, options: Options) => {
   if (request.method == "POST") {
     if (options.body instanceof FormData) {
       const newBody = options.body;
@@ -28,13 +28,42 @@ const hideLoading = () => {
   store.commit("setLoading", false);
 };
 
+const addAuthHeader = (token = localStorage.getItem("token")) => (
+  request: Request,
+) => {
+  if (token) {
+    request.headers.set("Authorization", `Bearer ${token}`);
+  }
+};
+
+const setError = async (req: Request, options: Options, resp: Response) => {
+  if (!resp.ok) {
+    const { error } = await resp.json();
+    store.commit("setError", { status: true, message: error });
+  }
+  return resp;
+};
+
+const resetError = () => {
+  store.commit("setError", { status: false, message: "" });
+};
+
 export const api = ky
   .create({ prefixUrl: baseUrl, searchParams: icodeParam })
   .extend({
     hooks: {
-      beforeRequest: [addIcodeToPostBody, showLoading],
-      afterResponse: [hideLoading],
+      beforeRequest: [
+        showLoading,
+        resetError,
+        addAuthHeader(),
+        addIcodeToPostBody,
+      ],
+      afterResponse: [hideLoading, setError],
     },
   });
+
+export const getAuthApi = (token: string) => {
+  return api.extend({ hooks: { beforeRequest: [addAuthHeader(token)] } });
+};
 
 export default api;

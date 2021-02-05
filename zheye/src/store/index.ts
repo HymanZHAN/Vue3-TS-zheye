@@ -1,13 +1,21 @@
 import { Commit, createStore } from "vuex";
-import api from "../services/base";
-import { GlobalDataProps, PostProps, Resp, TokenProps } from "./types";
+import { api, getAuthApi } from "../services/base";
+import {
+  GlobalDataProps,
+  GlobalErrorProps,
+  PostProps,
+  Resp,
+  TokenProps,
+} from "./types";
+
+let authApi = api;
 
 const getAndCommit = async <T>(
   url: string,
   mutation: string,
   commit: Commit,
 ) => {
-  const result = await api.get(url).json<Resp<T>>();
+  const result = await authApi.get(url).json<Resp<T>>();
   commit(mutation, result.data);
 };
 
@@ -17,22 +25,23 @@ const postAndCommit = async <T>(
   commit: Commit,
   payload: unknown,
 ) => {
-  const result = await api.post(url, { json: payload }).json<Resp<T>>();
+  const result = await authApi.post(url, { json: payload }).json<Resp<T>>();
   commit(mutation, result.data);
   return result;
 };
 
 export const store = createStore<GlobalDataProps>({
   state: {
-    token: "",
+    token: localStorage.getItem("token") || "",
     loading: false,
     columns: [],
     posts: [],
     user: {
-      columnId: "asdfasdf",
+      email: "",
       isLoggedIn: false,
-      name: "xzhan",
-      id: 1,
+    },
+    error: {
+      status: false,
     },
   },
 
@@ -47,7 +56,16 @@ export const store = createStore<GlobalDataProps>({
 
   mutations: {
     login(state, data) {
-      state.token = data.token;
+      const { token } = data;
+      state.token = token;
+    },
+    logout(state) {
+      state.user = { email: "", isLoggedIn: false };
+      state.token = "";
+      authApi = api;
+    },
+    setCurrentUser(state, data) {
+      state.user = { isLoggedIn: true, ...data };
     },
     createPost(state, newPost: PostProps) {
       state.posts.push(newPost);
@@ -64,6 +82,9 @@ export const store = createStore<GlobalDataProps>({
     setLoading(state, status) {
       state.loading = status;
     },
+    setError(state, e: GlobalErrorProps) {
+      state.error = e;
+    },
   },
 
   actions: {
@@ -79,13 +100,36 @@ export const store = createStore<GlobalDataProps>({
       await getAndCommit(`columns/${columnId}/posts`, "setPosts", commit);
     },
 
+    async fetchCurrentUser({ commit }) {
+      getAndCommit("user/current", "setCurrentUser", commit);
+    },
+
     async login({ commit }, payload) {
-      return await postAndCommit<TokenProps>(
-        "user/login",
-        "login",
-        commit,
-        payload,
-      );
+      try {
+        const result = await postAndCommit<TokenProps>(
+          "user/login",
+          "login",
+          commit,
+          payload,
+        );
+        const token = result.data.token;
+        localStorage.setItem("token", token);
+        authApi = getAuthApi(token);
+      } catch (error) {
+        console.log("login error:", error);
+      }
+    },
+
+    async loginAndFetchCurrentUser({ state, dispatch }, payload) {
+      await dispatch("login", payload);
+      if (!state.error.status) {
+        await dispatch("fetchCurrentUser");
+      }
+    },
+
+    logout({ commit }) {
+      localStorage.removeItem("token");
+      commit("logout");
     },
   },
 });
