@@ -21,7 +21,6 @@
         :rules="passwordRules"
       />
     </div>
-    <!-- <button type="submit" class="btn btn-primary" :slot="">Submit</button> -->
     <template #submit>
       <span class="btn btn-danger">Submit</span>
     </template>

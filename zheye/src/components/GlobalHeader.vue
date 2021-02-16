@@ -5,7 +5,7 @@
     </router-link>
     <ul v-if="!user.isLoggedIn" class="mb-0">
       <li class="list-inline-item ">
-        <router-link to="/login" class="btn btn-outline-light">
+        <router-link to="/register" class="btn btn-outline-light">
           注册
         </router-link>
       </li>

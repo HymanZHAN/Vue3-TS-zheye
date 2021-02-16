@@ -4,6 +4,7 @@ import { store } from "@/store";
 
 import Home from "./pages/Home.vue";
 import Login from "./pages/Login.vue";
+import Register from "./pages/Register.vue";
 import ColumnDetail from "./pages/ColumnDetail.vue";
 import CreatePost from "./pages/CreatePost.vue";
 
@@ -15,6 +16,11 @@ export const router = createRouter({
       path: "/",
       name: "Home",
       component: Home,
+    },
+    {
+      path: "/register",
+      name: "Register",
+      component: Register,
     },
     {
       path: "/login",

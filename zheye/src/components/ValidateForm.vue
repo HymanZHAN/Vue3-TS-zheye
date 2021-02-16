@@ -24,6 +24,7 @@ export default defineComponent({
 
   setup(props, context) {
     let validators: Validator[] = [];
+
     const registerValidator = (func: Validator | undefined) => {
       if (func) {
         validators.push(func);
