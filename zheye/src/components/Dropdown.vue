@@ -21,6 +21,9 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import mitt from "mitt";
+
+export const emitter = mitt();
 
 export default defineComponent({
   name: "Dropdown",
@@ -44,6 +47,8 @@ export default defineComponent({
         isOpen.value = false;
       }
     });
+
+    emitter.on("dropdown-item-clicked", toggleOpen);
 
     return { isOpen, toggleOpen, dropdownRef };
   },

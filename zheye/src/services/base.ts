@@ -2,7 +2,7 @@ import { store } from "@/store";
 import ky, { Options } from "ky";
 
 const baseUrl = "http://apis.imooc.com/api";
-const icode = "9D9FE119391E6C24";
+const icode = "A0AEFEEC4B540896";
 const icodeParam = `icode=${icode}`;
 
 const addIcodeToPostBody = (request: Request, options: Options) => {
@@ -49,7 +49,7 @@ const resetError = () => {
 };
 
 export const api = ky
-  .create({ prefixUrl: baseUrl, searchParams: icodeParam })
+  .create({ prefixUrl: baseUrl, searchParams: icodeParam, timeout: 30000 })
   .extend({
     hooks: {
       beforeRequest: [

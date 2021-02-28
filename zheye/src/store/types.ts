@@ -56,7 +56,7 @@ export interface ListData<T> {
   list: Array<T>;
 }
 
-export interface Resp<T> {
+export interface Resp<T = {}> {
   code: number;
   msg: string;
   data: T;

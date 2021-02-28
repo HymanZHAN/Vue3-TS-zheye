@@ -17,9 +17,11 @@
     </ul>
     <ul v-else class="mb-0">
       <li class="list-inline-item">
-        <dropdown :title="`你好，${user.nickName}`">
+        <Dropdown :title="`你好，${user.nickName}`">
           <DropdownItem>
-            <a href="#" class="dropdown-item">新建文章</a>
+            <router-link :to="{ name: 'CreatePost' }" class="dropdown-item">
+              新建文章
+            </router-link>
           </DropdownItem>
           <DropdownItem disabled>
             <a href="#" class="dropdown-item">修改资料</a>
@@ -27,7 +29,7 @@
           <DropdownItem>
             <a href="#" class="dropdown-item" @click="logout">退出登录</a>
           </DropdownItem>
-        </dropdown>
+        </Dropdown>
       </li>
     </ul>
   </nav>

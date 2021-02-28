@@ -1,11 +1,16 @@
 <template>
-  <li class="dropdown-option" :class="{ 'is-disabled': disabled }">
+  <li
+    class="dropdown-option"
+    :class="{ 'is-disabled': disabled }"
+    @click.prevent="emitClicked"
+  >
     <slot></slot>
   </li>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { emitter } from "@/components/Dropdown.vue";
 
 export default defineComponent({
   props: {
@@ -14,8 +19,12 @@ export default defineComponent({
       default: false,
     },
   },
+
   setup() {
-    return {};
+    const emitClicked = () => {
+      emitter.emit("dropdown-item-clicked");
+    };
+    return { emitClicked };
   },
 });
 </script>
