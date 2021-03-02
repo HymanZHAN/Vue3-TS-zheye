@@ -16,20 +16,6 @@
           </p>
         </div>
       </div>
-      <Uploader
-        action="upload/"
-        :beforeUpload="checkBeforeUpload"
-        @file-uploaded="onFileUploaded"
-        @file-uploaded-error="onFileUploadError"
-      >
-        <template #uploaded="dataProps">
-          <img
-            :src="dataProps.uploadedData.url"
-            alt="uploaded image"
-            width="500"
-          />
-        </template>
-      </Uploader>
     </section>
     <h4 class="font-weight-bold text-center">发现精彩</h4>
     <ColumnList :list="list"></ColumnList>
@@ -38,15 +24,15 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted } from "vue";
-import ColumnList from "@/components/ColumnList.vue";
 import { useStore } from "vuex";
+
 import { GlobalDataProps, ImageProps, Resp } from "@/store/types";
-import Uploader from "@/components/Uploader.vue";
 import { createMessage } from "@/components/createMessage";
+import ColumnList from "@/components/ColumnList.vue";
 
 export default defineComponent({
   name: "Home",
-  components: { ColumnList, Uploader },
+  components: { ColumnList },
   setup() {
     const store = useStore<GlobalDataProps>();
     onMounted(() => {

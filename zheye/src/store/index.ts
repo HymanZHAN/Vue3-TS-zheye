@@ -17,6 +17,7 @@ const getAndCommit = async <T>(
 ) => {
   const result = await authApi.get(url).json<Resp<T>>();
   commit(mutation, result.data);
+  return result;
 };
 
 const postAndCommit = async <T>(
@@ -60,8 +61,9 @@ export const store = createStore<GlobalDataProps>({
       state.token = token;
     },
     logout(state) {
-      state.user = { email: "", isLoggedIn: false };
       state.token = "";
+      state.user = { email: "", isLoggedIn: false };
+      localStorage.removeItem("token");
       authApi = api;
     },
     setCurrentUser(state, data) {
@@ -101,7 +103,7 @@ export const store = createStore<GlobalDataProps>({
     },
 
     async fetchCurrentUser({ commit }) {
-      getAndCommit("user/current", "setCurrentUser", commit);
+      return getAndCommit("user/current", "setCurrentUser", commit);
     },
 
     async login({ commit }, payload) {
@@ -118,6 +120,15 @@ export const store = createStore<GlobalDataProps>({
       } catch (error) {
         console.log("login error:", error);
       }
+    },
+
+    async createPost({ commit }, payload) {
+      return await postAndCommit<PostProps>(
+        "posts",
+        "createPost",
+        commit,
+        payload,
+      );
     },
 
     async loginAndFetchCurrentUser({ state, dispatch }, payload) {

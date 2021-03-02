@@ -47,11 +47,37 @@ export const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresLogin && !store.state.user.isLoggedIn) {
-    next({ name: "Login" });
-  } else if (to.meta.redirectsIfLoggedIn && store.state.user.isLoggedIn) {
-    next({ name: "Home" });
+  const { user, token } = store.state;
+  const { requiredLogin, redirectsIfLoggedIn } = to.meta;
+
+  if (!user.isLoggedIn) {
+    if (token) {
+      store
+        .dispatch("fetchCurrentUser")
+        .then(() => {
+          if (redirectsIfLoggedIn) {
+            next("/");
+          } else {
+            next();
+          }
+        })
+        .catch((e) => {
+          console.error(e);
+          localStorage.removeItem("token");
+          next("/login");
+        });
+    } else {
+      if (requiredLogin) {
+        next("/login");
+      } else {
+        next();
+      }
+    }
   } else {
-    next();
+    if (redirectsIfLoggedIn) {
+      next("/");
+    } else {
+      next();
+    }
   }
 });

@@ -6,13 +6,11 @@ const icode = "A0AEFEEC4B540896";
 const icodeParam = `icode=${icode}`;
 
 const addIcodeToPostBody = (request: Request, options: Options) => {
-  if (request.method == "POST") {
+  if (request.method === "POST") {
     if (options.body instanceof FormData) {
-      const newBody = options.body;
-      newBody.append("icode", icode);
-      return new Request(request, {
-        body: newBody,
-      });
+      request.headers.delete("content-type");
+      options.body.append("icode", icode);
+      return new Request(request, options as RequestInit);
     } else if (options.json instanceof Object) {
       return new Request(request, {
         body: JSON.stringify({ ...options.json, icode }),
@@ -21,8 +19,10 @@ const addIcodeToPostBody = (request: Request, options: Options) => {
   }
 };
 
-const showLoading = () => {
-  store.commit("setLoading", true);
+const showLoading = (request: Request) => {
+  if (request.method === "GET") {
+    store.commit("setLoading", true);
+  }
 };
 const hideLoading = () => {
   store.commit("setLoading", false);
