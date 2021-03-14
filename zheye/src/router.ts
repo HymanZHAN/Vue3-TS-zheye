@@ -7,6 +7,7 @@ import Login from "./pages/Login.vue";
 import Register from "./pages/Register.vue";
 import ColumnDetail from "./pages/ColumnDetail.vue";
 import CreatePost from "./pages/CreatePost.vue";
+import PostDetail from "./pages/PostDetail.vue";
 
 const routerHistory = createWebHistory();
 export const router = createRouter({
@@ -31,9 +32,17 @@ export const router = createRouter({
       },
     },
     {
-      path: "/column/:id",
+      path: "/columns/:id",
       name: "ColumnDetail",
       component: ColumnDetail,
+    },
+    {
+      path: `/columns/my-column`,
+      name: "MyColumnDetail",
+      component: ColumnDetail,
+      props: {
+        isMyColumn: true,
+      },
     },
     {
       path: "/post/create",
@@ -43,12 +52,17 @@ export const router = createRouter({
         requiresLogin: true,
       },
     },
+    {
+      path: "/posts/:id",
+      name: "PostDetail",
+      component: PostDetail,
+    },
   ],
 });
 
 router.beforeEach((to, from, next) => {
   const { user, token } = store.state;
-  const { requiredLogin, redirectsIfLoggedIn } = to.meta;
+  const { requiresLogin, redirectsIfLoggedIn } = to.meta;
 
   if (!user.isLoggedIn) {
     if (token) {
@@ -67,7 +81,7 @@ router.beforeEach((to, from, next) => {
           next("/login");
         });
     } else {
-      if (requiredLogin) {
+      if (requiresLogin) {
         next("/login");
       } else {
         next();

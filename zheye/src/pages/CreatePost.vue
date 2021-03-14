@@ -6,6 +6,7 @@
       action="upload"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
       :beforeUpload="uploadCheck"
+      @file-uploaded="handleFileUpload"
     >
       <h2>点击上传头图</h2>
 
@@ -61,7 +62,7 @@ import { useRouter } from "vue-router";
 import ValidateForm from "@/components/ValidateForm.vue";
 import ValidateInput, { RulesProp } from "@/components/ValidateInput.vue";
 import Uploader from "@/components/Uploader.vue";
-import { GlobalDataProps } from "@/store/types";
+import { GlobalDataProps, ImageProps, Resp } from "@/store/types";
 import { PostProps } from "@/store/types";
 import { beforeUploadCheck } from "@/helper";
 import { createMessage } from "@/components/createMessage";
@@ -76,6 +77,7 @@ export default defineComponent({
   setup() {
     const store = useStore<GlobalDataProps>();
     const router = useRouter();
+    let imageId = "";
 
     const titleVal = ref("");
     const titleRules: RulesProp = [
@@ -87,19 +89,30 @@ export default defineComponent({
       { type: "required", message: "文章内容不能为空" },
     ];
 
-    const onFormSubmit = (isFormValid: boolean) => {
+    const handleFileUpload = (rawData: Resp<ImageProps>) => {
+      if (rawData.data._id) {
+        imageId = rawData.data._id;
+      }
+    };
+
+    const onFormSubmit = async (isFormValid: boolean) => {
       if (isFormValid) {
-        const { column } = store.state.user;
+        const { column, _id } = store.state.user;
         if (column) {
           const newPost: PostProps = {
-            _id: "",
             title: titleVal.value,
             content: contentVal.value,
-            column: column,
-            createdAt: new Date().toLocaleString(),
+            column,
+            author: _id,
           };
-          store.commit("createPost", newPost);
-          router.push({ name: "ColumnDetail", params: { id: column } });
+          if (imageId) {
+            newPost.image = imageId;
+          }
+          await store.dispatch("createPost", newPost);
+          createMessage("发表成功，2秒后跳转到文章", "success");
+          setTimeout(() => {
+            router.push({ name: "ColumnDetail", params: { id: column } });
+          }, 2000);
         }
       }
     };
@@ -127,6 +140,7 @@ export default defineComponent({
       contentVal,
       contentRules,
       uploadCheck,
+      handleFileUpload,
     };
   },
 });

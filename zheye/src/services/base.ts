@@ -28,9 +28,10 @@ const hideLoading = () => {
   store.commit("setLoading", false);
 };
 
-const addAuthHeader = (token = localStorage.getItem("token")) => (
-  request: Request,
-) => {
+const addAuthHeader = (token = "") => (request: Request) => {
+  if (!token) {
+    token = localStorage.getItem("token") || "";
+  }
   if (token) {
     request.headers.set("Authorization", `Bearer ${token}`);
   }
@@ -64,6 +65,10 @@ export const api = ky
 
 export const getAuthApi = (token: string) => {
   return api.extend({ hooks: { beforeRequest: [addAuthHeader(token)] } });
+};
+
+export const getApi = () => {
+  return api.extend({});
 };
 
 export default api;

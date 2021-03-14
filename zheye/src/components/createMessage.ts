@@ -3,7 +3,11 @@ import { createApp } from "vue";
 
 export type MessageType = "success" | "error" | "default";
 
-export const createMessage = (message: string, type: MessageType) => {
+export const createMessage = (
+  message: string,
+  type: MessageType,
+  delayTime = 2000,
+) => {
   const messageInstance = createApp(Message, { message, type });
   const mountNode = document.createElement("div");
   document.body.appendChild(mountNode);
@@ -12,5 +16,5 @@ export const createMessage = (message: string, type: MessageType) => {
   setTimeout(() => {
     messageInstance.unmount(mountNode);
     document.body.removeChild(mountNode);
-  }, 2000);
+  }, delayTime);
 };

@@ -34,11 +34,22 @@ export default defineComponent({
   components: {
     PostList,
   },
-  setup() {
+  props: {
+    isMyColumn: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
     const route = useRoute();
     const store = useStore();
 
-    const currentId = route.params.id;
+    let currentId = "";
+    if (props.isMyColumn) {
+      currentId = store.state.myColumnId;
+    } else {
+      currentId = route.params.id as string;
+    }
 
     onMounted(() => {
       store.dispatch("fetchColumn", currentId);

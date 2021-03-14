@@ -12,13 +12,14 @@ export interface ColumnProps {
 }
 
 export interface PostProps {
-  _id: string;
+  _id?: string;
   title: string;
   excerpt?: string;
   content?: string;
-  image?: ImageProps;
+  image?: ImageProps | string;
   column: string;
-  createdAt: string;
+  createdAt?: string;
+  author?: string;
 }
 
 export interface UserProps {
@@ -40,6 +41,8 @@ export interface GlobalDataProps {
   loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
+  post: PostProps | null;
+  myColumnId: string;
   user: UserProps;
   error: GlobalErrorProps;
 }
