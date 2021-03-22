@@ -43,7 +43,7 @@
       />
     </div>
     <template #submit>
-      <span class="btn btn-danger">Submit</span>
+      <span class="btn btn-danger">注册</span>
     </template>
   </ValidateForm>
 </template>

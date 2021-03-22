@@ -24,7 +24,7 @@
     </div>
     <!-- <button type="submit" class="btn btn-primary" :slot="">Submit</button> -->
     <template #submit>
-      <span class="btn btn-danger">Submit</span>
+      <span class="btn btn-danger">提交</span>
     </template>
   </ValidateForm>
 </template>

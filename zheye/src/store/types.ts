@@ -16,11 +16,20 @@ export interface PostProps {
   title: string;
   excerpt?: string;
   content?: string;
-  image?: ImageProps | string;
   column: string;
   createdAt?: string;
-  author?: string;
+  image?: ImageProps | string;
+  author?: string | UserProps;
 }
+
+export const EMPTY_POST: PostProps = {
+  author: "",
+  title: "",
+  column: "",
+  excerpt: "",
+  content: "",
+  image: "",
+};
 
 export interface UserProps {
   _id?: string;

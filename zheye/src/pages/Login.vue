@@ -22,7 +22,7 @@
       />
     </div>
     <template #submit>
-      <span class="btn btn-danger">Submit</span>
+      <span class="btn btn-danger">登录</span>
     </template>
   </ValidateForm>
 </template>

@@ -8,12 +8,22 @@
     <h1 class="my-2">{{ post.title }}</h1>
     <UserProfile :dateInfo="post.createdAt" />
     <div class="post-content" v-html="postContent"></div>
+    <div v-if="showEditArea" class="btn-group mt-5">
+      <router-link
+        type="button"
+        class="btn btn-success"
+        :to="{ name: 'EditPost', query: { id: post._id } }"
+      >
+        编辑
+      </router-link>
+      <button type="button" class="btn btn-danger">删除</button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { ImageProps, PostProps } from "@/store/types";
-import { computed, ComputedRef, defineComponent, onMounted } from "vue";
+import { GlobalDataProps, UserProps } from "@/store/types";
+import { computed, defineComponent, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import marked from "marked";
@@ -29,16 +39,16 @@ export default defineComponent({
 
   setup() {
     const route = useRoute();
-    const store = useStore();
+    const store = useStore<GlobalDataProps>();
     const currentId = route.params.id;
 
     onMounted(async () => {
       await store.dispatch("fetchPost", currentId);
     });
 
-    const post: ComputedRef<PostProps> = computed(() => store.state.post);
+    const post = computed(() => store.state.post);
 
-    const imageUrl: ComputedRef<ImageProps | string> = computed(() => {
+    const imageUrl = computed(() => {
       if (post.value) {
         if (post.value.image) {
           if (typeof post.value.image === "string") {
@@ -53,10 +63,20 @@ export default defineComponent({
     });
 
     const postContent = computed(() => {
-      return marked(post.value.content ?? "");
+      return marked(post.value?.content ?? "");
     });
 
-    return { post, postContent, imageUrl };
+    const showEditArea = computed(() => {
+      const { _id, isLoggedIn } = store.state.user;
+      if (post.value && post.value.author && isLoggedIn) {
+        const postAuthor = post.value.author as UserProps;
+        return postAuthor._id === _id;
+      } else {
+        return false;
+      }
+    });
+
+    return { post, postContent, imageUrl, showEditArea };
   },
 });
 </script>

@@ -53,6 +53,14 @@ export const router = createRouter({
       },
     },
     {
+      path: "/post/edit",
+      name: "EditPost",
+      component: CreatePost,
+      meta: {
+        requiresLogin: true,
+      },
+    },
+    {
       path: "/posts/:id",
       name: "PostDetail",
       component: PostDetail,
