@@ -6,7 +6,7 @@ const icode = "A0AEFEEC4B540896";
 const icodeParam = `icode=${icode}`;
 
 const addIcodeToPostBody = (request: Request, options: Options) => {
-  if (request.method === "POST") {
+  if (request.method === "POST" || request.method === "PATCH") {
     if (options.body instanceof FormData) {
       request.headers.delete("content-type");
       options.body.append("icode", icode);
@@ -62,13 +62,5 @@ export const api = ky
       afterResponse: [hideLoading, setError],
     },
   });
-
-export const getAuthApi = (token: string) => {
-  return api.extend({ hooks: { beforeRequest: [addAuthHeader(token)] } });
-};
-
-export const getApi = () => {
-  return api.extend({});
-};
 
 export default api;

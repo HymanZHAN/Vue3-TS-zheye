@@ -1,33 +1,11 @@
-import { Commit, createStore } from "vuex";
-import { api } from "../services/base";
+import { createStore } from "vuex";
 import {
   GlobalDataProps,
   GlobalErrorProps,
   PostProps,
-  Resp,
   TokenProps,
 } from "./types";
-
-const getAndCommit = async <T>(
-  url: string,
-  mutation: string,
-  commit: Commit,
-) => {
-  const result = await api.get(url).json<Resp<T>>();
-  commit(mutation, result.data);
-  return result;
-};
-
-const postAndCommit = async <T>(
-  url: string,
-  mutation: string,
-  commit: Commit,
-  payload: unknown,
-) => {
-  const result = await api.post(url, { json: payload }).json<Resp<T>>();
-  commit(mutation, result.data);
-  return result;
-};
+import { getAndCommit, patchAndCommit, postAndCommit } from "./helpers";
 
 export const store = createStore<GlobalDataProps>({
   state: {
@@ -78,6 +56,16 @@ export const store = createStore<GlobalDataProps>({
     setPost(state, data) {
       state.post = data;
     },
+    updatePost(state, data) {
+      state.post = data;
+      state.posts = state.posts.map((p) => {
+        if (p._id === data._id) {
+          return data;
+        } else {
+          return p;
+        }
+      });
+    },
     setColumns(state, data) {
       state.columns = data.list;
     },
@@ -110,7 +98,18 @@ export const store = createStore<GlobalDataProps>({
     },
 
     async fetchPost({ commit }, postId) {
-      await getAndCommit(`posts/${postId}`, "setPost", commit);
+      const result = await getAndCommit(`posts/${postId}`, "setPost", commit);
+      return result.data;
+    },
+
+    async updatePost({ commit }, { postId, payload }) {
+      const result = await patchAndCommit(
+        `posts/${postId}`,
+        "updatePost",
+        commit,
+        payload,
+      );
+      return result.data;
     },
 
     async login({ commit }, payload) {

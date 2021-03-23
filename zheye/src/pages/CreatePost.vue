@@ -1,12 +1,13 @@
 <template>
   <div class="create-post-page">
-    <h4 class="mb-3">新建文章</h4>
+    <h4 class="mb-3">{{ isEditMode ? "编辑文章" : "新建文章" }}</h4>
 
     <Uploader
       action="upload"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
       :beforeUpload="uploadCheck"
       @file-uploaded="handleFileUpload"
+      :uploadedFile="uploadedFile"
     >
       <h2>点击上传头图</h2>
 
@@ -26,6 +27,8 @@
         />
       </template>
     </Uploader>
+
+    <h2>{{ titleVal }}</h2>
 
     <ValidateForm @form-submit="onFormSubmit">
       <div class="mb-3">
@@ -48,16 +51,18 @@
         />
       </div>
       <template #submit>
-        <button class="btn btn-primary">发表文章</button>
+        <button class="btn btn-primary">
+          {{ isEditMode ? "更新文章" : "发表文章" }}
+        </button>
       </template>
     </ValidateForm>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 import ValidateForm from "@/components/ValidateForm.vue";
 import ValidateInput, { RulesProp } from "@/components/ValidateInput.vue";
@@ -77,6 +82,7 @@ export default defineComponent({
   setup() {
     const store = useStore<GlobalDataProps>();
     const router = useRouter();
+    const route = useRoute();
     let imageId = "";
 
     const titleVal = ref("");
@@ -88,6 +94,24 @@ export default defineComponent({
     const contentRules: RulesProp = [
       { type: "required", message: "文章内容不能为空" },
     ];
+
+    const isEditMode = !!route.query.id;
+    const uploadedFile = ref();
+
+    onMounted(async () => {
+      if (isEditMode) {
+        const postId = route.query.id;
+        const currentPost: PostProps = await store.dispatch(
+          "fetchPost",
+          postId,
+        );
+        if (currentPost && currentPost.image) {
+          uploadedFile.value = { data: currentPost.image };
+        }
+        titleVal.value = currentPost.title;
+        contentVal.value = currentPost.content || "";
+      }
+    });
 
     const handleFileUpload = (rawData: Resp<ImageProps>) => {
       if (rawData.data._id) {
@@ -108,10 +132,24 @@ export default defineComponent({
           if (imageId) {
             newPost.image = imageId;
           }
-          await store.dispatch("createPost", newPost);
-          createMessage("发表成功，2秒后跳转到文章", "success");
+
+          const actionName = isEditMode ? "updatePost" : "createPost";
+          const payload = isEditMode
+            ? { postId: route.query.id, payload: newPost }
+            : newPost;
+          const redirectRoute = isEditMode
+            ? { name: "PostDetail", params: { id: route.query.id as string } }
+            : { name: "ColumnDetail", params: { id: column } };
+
+          console.log(payload);
+
+          await store.dispatch(actionName, payload);
+          createMessage(
+            `${isEditMode ? "更新" : "发表"}成功，2秒后跳转到文章`,
+            "success",
+          );
           setTimeout(() => {
-            router.push({ name: "ColumnDetail", params: { id: column } });
+            router.push(redirectRoute);
           }, 2000);
         }
       }
@@ -141,6 +179,8 @@ export default defineComponent({
       contentRules,
       uploadCheck,
       handleFileUpload,
+      uploadedFile,
+      isEditMode,
     };
   },
 });

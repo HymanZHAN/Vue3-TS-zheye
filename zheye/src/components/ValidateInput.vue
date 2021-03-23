@@ -2,19 +2,17 @@
   <div class="validate-input-container pb-3">
     <input
       v-if="tag !== 'textarea'"
+      v-model="inputRef.val"
       class="form-control"
       :class="{ 'is-invalid': inputRef.error }"
-      :value="inputRef.val"
-      @input="updateValue"
       @blur="validateInput"
       v-bind="$attrs"
     />
     <textarea
       v-else
+      v-model="inputRef.val"
       class="form-control"
       :class="{ 'is-invalid': inputRef.error }"
-      :value="inputRef.val"
-      @input="updateValue"
       @blur="validateInput"
       v-bind="$attrs"
     />
@@ -25,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, PropType, reactive } from "vue";
+import { computed, defineComponent, onMounted, PropType, reactive } from "vue";
 
 import { emitter } from "./ValidateForm.vue";
 
@@ -52,16 +50,15 @@ export default defineComponent({
 
   setup(props, context) {
     const inputRef = reactive({
-      val: props.modelValue || "",
+      val: computed({
+        get: () => props.modelValue || "",
+        set: (val) => {
+          context.emit("update:modelValue", val);
+        },
+      }),
       error: false,
       message: "",
     });
-
-    const updateValue = (e: KeyboardEvent) => {
-      const targetValue = (e.target as HTMLInputElement).value;
-      inputRef.val = targetValue;
-      context.emit("update:modelValue", targetValue);
-    };
 
     const validateInput = () => {
       if (props.rules) {
@@ -96,7 +93,6 @@ export default defineComponent({
     return {
       inputRef,
       validateInput,
-      updateValue,
     };
   },
 });

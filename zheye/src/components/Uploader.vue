@@ -30,12 +30,14 @@
 
 <script lang="ts">
 import api from "@/services/base";
-import { defineComponent, PropType, ref } from "vue";
+import { PostProps, Resp } from "@/store/types";
+import { defineComponent, onMounted, PropType, ref, watch } from "vue";
 
 type UploadStatus = "ready" | "loading" | "success" | "error";
 type CheckFunction = (file: File) => boolean;
 
 export default defineComponent({
+  name: "Uploader",
   props: {
     action: {
       type: String,
@@ -43,6 +45,9 @@ export default defineComponent({
     },
     beforeUpload: {
       type: Function as PropType<CheckFunction>,
+    },
+    uploadedFile: {
+      type: Object,
     },
   },
 
@@ -52,8 +57,30 @@ export default defineComponent({
 
   setup(props, context) {
     const fileInput = ref<null | HTMLInputElement>();
-    const fileStatus = ref<UploadStatus>("ready");
-    const uploadedData = ref();
+    const fileStatus = ref<UploadStatus>(
+      props.uploadedFile ? "success" : "ready",
+    );
+    const uploadedData = ref(props.uploadedFile);
+
+    onMounted(() => {
+      console.log(props.uploadedFile);
+      if (props.uploadedFile) {
+        fileStatus.value = "success";
+        uploadedData.value = props.uploadedFile;
+      }
+    });
+
+    watch(
+      () => props.uploadedFile,
+      (newValue) => {
+        console.log(newValue);
+        if (newValue) {
+          fileStatus.value = "success";
+          uploadedData.value = newValue;
+        }
+      },
+    );
+
     const triggerUpload = () => {
       fileInput.value?.click();
     };
@@ -74,7 +101,9 @@ export default defineComponent({
         formData.append("file", files[0]);
 
         try {
-          const resp = await api.post(props.action, { body: formData }).json();
+          const resp: Resp<PostProps> = await api
+            .post(props.action, { body: formData })
+            .json();
           fileStatus.value = "success";
           uploadedData.value = resp;
           context.emit("file-uploaded", resp);
