@@ -5,7 +5,12 @@ import {
   PostProps,
   TokenProps,
 } from "./types";
-import { getAndCommit, patchAndCommit, postAndCommit } from "./helpers";
+import {
+  deleteAndCommit,
+  getAndCommit,
+  patchAndCommit,
+  postAndCommit,
+} from "./helpers";
 
 export const store = createStore<GlobalDataProps>({
   state: {
@@ -66,6 +71,10 @@ export const store = createStore<GlobalDataProps>({
         }
       });
     },
+    deletePost(state, deletedPostId) {
+      state.post = null;
+      state.posts = state.posts.filter((p) => p._id !== deletedPostId);
+    },
     setColumns(state, data) {
       state.columns = data.list;
     },
@@ -93,6 +102,15 @@ export const store = createStore<GlobalDataProps>({
       await getAndCommit(`columns/${columnId}`, "setColumn", commit);
     },
 
+    async createPost({ commit }, payload) {
+      return await postAndCommit<PostProps>(
+        "posts",
+        "createPost",
+        commit,
+        payload,
+      );
+    },
+
     async fetchPosts({ commit }, columnId) {
       await getAndCommit(`columns/${columnId}/posts`, "setPosts", commit);
     },
@@ -103,13 +121,31 @@ export const store = createStore<GlobalDataProps>({
     },
 
     async updatePost({ commit }, { postId, payload }) {
-      const result = await patchAndCommit(
-        `posts/${postId}`,
-        "updatePost",
-        commit,
-        payload,
-      );
-      return result.data;
+      try {
+        const result = await patchAndCommit(
+          `posts/${postId}`,
+          "updatePost",
+          commit,
+          payload,
+        );
+        return result.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async deletePost({ commit }, postId) {
+      try {
+        const result = await deleteAndCommit<PostProps>(
+          `posts/${postId}`,
+          "deletePost",
+          commit,
+          postId,
+        );
+        return result;
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async login({ commit }, payload) {
@@ -125,15 +161,6 @@ export const store = createStore<GlobalDataProps>({
       } catch (error) {
         console.log("login error:", error);
       }
-    },
-
-    async createPost({ commit }, payload) {
-      return await postAndCommit<PostProps>(
-        "posts",
-        "createPost",
-        commit,
-        payload,
-      );
     },
 
     async loginAndFetchCurrentUser({ state, dispatch }, payload) {

@@ -34,3 +34,14 @@ export const patchAndCommit = async <T>(
   commit(mutation, result.data);
   return result;
 };
+
+export const deleteAndCommit = async <T>(
+  url: string,
+  mutation: string,
+  commit: Commit,
+  postId: string,
+) => {
+  const result = await api.delete(url).json<Resp<T>>();
+  commit(mutation, postId);
+  return result;
+};
