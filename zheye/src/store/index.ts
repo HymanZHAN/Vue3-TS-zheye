@@ -171,7 +171,6 @@ export const store = createStore<GlobalDataProps>({
     },
 
     logout({ commit }) {
-      localStorage.removeItem("token");
       commit("logout");
     },
   },
